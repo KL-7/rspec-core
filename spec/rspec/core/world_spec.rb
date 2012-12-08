@@ -100,31 +100,45 @@ module RSpec::Core
           end
         end
 
-        context "with an inclusion filter" do
-          it "announces" do
-            configuration.filter_run_including :foo => 'bar'
-            reporter.should_receive(:message).
-              with(/All examples were filtered out/)
-            world.announce_filters
+        context "without run_all_when_everything_filtered" do
+          context "with an inclusion filter" do
+            it "announces" do
+              configuration.filter_run_including :foo => 'bar'
+              reporter.should_receive(:message).
+                  with(/All examples were filtered out/)
+              world.announce_filters
+            end
+          end
+
+          context "with an exclusion filter" do
+            it "announces" do
+              configuration.filter_run_excluding :foo => 'bar'
+              reporter.should_receive(:message).
+                  with(/All examples were filtered out/)
+              world.announce_filters
+            end
           end
         end
 
-        context "with an inclusion filter and run_all_when_everything_filtered" do
-          it "announces" do
-            configuration.stub(:run_all_when_everything_filtered?) { true }
-            configuration.filter_run_including :foo => 'bar'
-            reporter.should_receive(:message).
-              with(/All examples were filtered out/)
-            world.announce_filters
-          end
-        end
+        context "with run_all_when_everything_filtered" do
+          before { configuration.stub(:run_all_when_everything_filtered?) { true } }
 
-        context "with an exclusion filter" do
-          it "announces" do
-            configuration.filter_run_excluding :foo => 'bar'
-            reporter.should_receive(:message).
-              with(/All examples were filtered out/)
-            world.announce_filters
+          context "with an inclusion filter" do
+            it "announces" do
+              configuration.filter_run_including :foo => 'bar'
+              reporter.should_receive(:message).
+                  with(/No examples found/)
+              world.announce_filters
+            end
+          end
+
+          context "with an exclusion filter" do
+            it "announces" do
+              configuration.filter_run_excluding :foo => 'bar'
+              reporter.should_receive(:message).
+                  with(/No examples found/)
+              world.announce_filters
+            end
           end
         end
       end
